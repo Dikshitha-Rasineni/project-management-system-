@@ -10,7 +10,7 @@ either platform works on the other and every change shows up on both after a ref
 |---|---|
 | Web app | https://project-management-system-2q8b.vercel.app |
 | Backend API | https://tasklane-api-w9ik.onrender.com/api/docs |
-| Demo video |https://drive.google.com/file/d/1u_EJj8gEusAaZi4Oy998Y0u6VWcy61x-/view?usp=drivesdk|
+| Demo video |https://drive.google.com/file/d/1kaO5XQyFY2kz-b8m-PW6u5vEpmwHeADb/view?usp=drivesdk|
 
 ---
 
