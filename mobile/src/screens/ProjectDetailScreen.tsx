@@ -37,11 +37,11 @@ export default function ProjectDetailScreen() {
       <View style={styles.dates}>
         <View style={{ flex: 1 }}>
           <Text style={styles.label}>Start</Text>
-          <Text style={styles.value}>{formatDate(project.startDate)}</Text>
+          <Text style={styles.dateValue}>{formatDate(project.startDate)}</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.label}>End</Text>
-          <Text style={styles.value}>{formatDate(project.endDate, 'Not set')}</Text>
+          <Text style={styles.dateValue}>{formatDate(project.endDate, 'Not set')}</Text>
         </View>
       </View>
       <View style={{ gap: 6 }}>
@@ -71,6 +71,6 @@ const styles = StyleSheet.create({
   desc: { fontSize: 14, color: colors.inkSoft, lineHeight: 20 },
   dates: { flexDirection: 'row', gap: 12 },
   label: { fontSize: 12, color: colors.inkMute },
-  value: { fontSize: 15, fontWeight: '500', color: colors.ink, marginTop: 2 },
+  dateValue: { fontSize: 15, fontWeight: '500', color: colors.ink, marginTop: 2 },
   progressText: { flexDirection: 'row', justifyContent: 'space-between' },
 });

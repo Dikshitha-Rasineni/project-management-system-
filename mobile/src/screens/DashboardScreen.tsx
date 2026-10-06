@@ -26,9 +26,9 @@ function Stat({ label, value, onPress, wide }: { label: string; value: number; o
 
 function WorkBar({ d }: { d: DashboardStats }) {
   const segs = [
-    { label: 'Completed', value: d.completedTasks, color: colors.doneBar },
-    { label: 'In progress', value: d.inProgressTasks, color: colors.progressBar },
-    { label: 'Pending', value: d.pendingTasks, color: colors.pending + '90' },
+    { label: 'Completed', count: d.completedTasks, color: colors.doneBar },
+    { label: 'In progress', count: d.inProgressTasks, color: colors.progressBar },
+    { label: 'Pending', count: d.pendingTasks, color: colors.pending + '90' },
   ];
   return (
     <View style={styles.card}>
@@ -42,7 +42,7 @@ function WorkBar({ d }: { d: DashboardStats }) {
         {d.totalTasks === 0 ? (
           <View style={{ flex: 1, backgroundColor: colors.line }} />
         ) : (
-          segs.filter((s) => s.value > 0).map((s) => <View key={s.label} style={{ flex: s.value, backgroundColor: s.color }} />)
+          segs.filter((s) => s.count > 0).map((s) => <View key={s.label} style={{ flex: s.count, backgroundColor: s.color }} />)
         )}
       </View>
       <View style={styles.legend}>
@@ -50,7 +50,7 @@ function WorkBar({ d }: { d: DashboardStats }) {
           <View key={s.label} style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: s.color }]} />
             <Text style={styles.small}>
-              {s.label} <Text style={styles.strong}>{s.value}</Text>
+              {s.label} <Text style={styles.strong}>{s.count}</Text>
             </Text>
           </View>
         ))}
