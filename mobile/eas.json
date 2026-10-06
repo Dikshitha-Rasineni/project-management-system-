@@ -13,7 +13,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-YOUR-BACKEND.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://tasklane-api-w9ik.onrender.com/api"
       }
     },
     "ios-simulator": {
@@ -22,7 +22,7 @@
         "simulator": true
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-YOUR-BACKEND.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://tasklane-api-w9ik.onrender.com/api"
       }
     },
     "production": {
@@ -30,7 +30,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-YOUR-BACKEND.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://tasklane-api-w9ik.onrender.com/api"
       }
     }
   },
