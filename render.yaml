@@ -1,0 +1,28 @@
+# Render Blueprint for the backend API.
+# Render dashboard → New → Blueprint → select this repo.
+# The database is external (Neon/Supabase free tier): paste its URL into
+# DATABASE_URL when Render prompts for the `sync: false` values.
+services:
+  - type: web
+    name: pms-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        sync: false # e.g. https://your-web-app.vercel.app
+      - key: TRUST_PROXY
+        value: '1'
+      - key: LOG_LEVEL
+        value: info

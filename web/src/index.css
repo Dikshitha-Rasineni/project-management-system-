@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Design tokens — "drafting desk": cool paper, ink, one cobalt action
+   colour, and three status hues used consistently everywhere.
+   ------------------------------------------------------------------ */
+@theme {
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-paper: #f7f9fb;
+  --color-surface: #ffffff;
+  --color-ink: #1b2433;
+  --color-ink-soft: #4a5568;
+  --color-ink-mute: #77839a;
+  --color-line: #dde3ea;
+  --color-line-strong: #c5ceda;
+
+  --color-action: #2952cc;
+  --color-action-hover: #1f43ad;
+  --color-action-tint: #e8eefc;
+
+  --color-pending: #6b7a90;
+  --color-pending-tint: #eef1f5;
+  --color-progress: #b7791f;
+  --color-progress-bar: #f2b544;
+  --color-progress-tint: #fdf4e1;
+  --color-done: #23855a;
+  --color-done-bar: #3baa78;
+  --color-done-tint: #e4f4ec;
+
+  --color-danger: #c2412d;
+  --color-danger-hover: #a5331f;
+  --color-danger-tint: #fcebe7;
+
+  --radius-box: 10px;
+  --radius-control: 8px;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-paper text-ink font-sans;
+    font-feature-settings: 'tnum' 1;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-action);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-action-tint);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.animate-grow-x {
+  transform-origin: left;
+  animation: grow-x 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}

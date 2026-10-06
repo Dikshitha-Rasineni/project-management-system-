@@ -1,0 +1,104 @@
+// Prisma schema for the Project Management System.
+// One PostgreSQL database is shared by the web app and the mobile app
+// through a single REST backend.
+
+// Prisma 7: the client is generated into src/generated (TypeScript, no
+// native query-engine binary) and talks to PostgreSQL through the `pg`
+// driver adapter. The connection URL lives in prisma.config.ts.
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+/// An account. The same account is used from web and mobile.
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  fullName     String    @map("full_name") @db.VarChar(100)
+  /// Stored lower-cased so uniqueness is case-insensitive.
+  email        String    @unique @db.VarChar(254)
+  /// bcrypt hash — the plain-text password is never stored.
+  passwordHash String    @map("password_hash") @db.VarChar(100)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  projects     Project[]
+
+  @@map("users")
+}
+
+/// A project owned by exactly one user.
+model Project {
+  id          String        @id @default(uuid()) @db.Uuid
+  name        String        @db.VarChar(120)
+  description String?       @db.VarChar(2000)
+  status      ProjectStatus @default(NOT_STARTED)
+  startDate   DateTime      @map("start_date") @db.Date
+  endDate     DateTime?     @map("end_date") @db.Date
+  ownerId     String        @map("owner_id") @db.Uuid
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  owner       User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+
+  @@index([ownerId, status])
+  @@index([ownerId, createdAt])
+  @@map("projects")
+}
+
+/// A task that belongs to exactly one project. Ownership is derived
+/// through the project (no duplicated owner column => normalized).
+model Task {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String       @db.VarChar(160)
+  description String?      @db.VarChar(2000)
+  priority    TaskPriority @default(MEDIUM)
+  status      TaskStatus   @default(PENDING)
+  dueDate     DateTime?    @map("due_date") @db.Date
+  completedAt DateTime?    @map("completed_at") @db.Timestamptz(3)
+  projectId   String       @map("project_id") @db.Uuid
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
+  @@index([projectId, priority])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+/// Denylist of JWT IDs revoked by logout, so a logged-out token cannot be
+/// replayed until it would have expired anyway. Rows past expiresAt are
+/// pruned periodically.
+model RevokedToken {
+  jti       String   @id @db.VarChar(64)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([expiresAt])
+  @@map("revoked_tokens")
+}

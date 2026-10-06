@@ -1,0 +1,40 @@
+# Local stack: PostgreSQL + the API.
+#   docker compose up --build
+# API: http://localhost:4000/api   Docs: http://localhost:4000/api/docs
+# Then run the web app (`cd web && npm run dev`) and the mobile app as usual.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pms
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d pms']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/pms?schema=public
+      # Local-only secret. Use a long random value in any real deployment.
+      JWT_SECRET: docker-local-dev-secret-change-me-0123456789
+      JWT_EXPIRES_IN: 7d
+      CORS_ORIGIN: http://localhost:5173
+      LOG_LEVEL: info
+    ports:
+      - '4000:4000'
+
+volumes:
+  pgdata:
