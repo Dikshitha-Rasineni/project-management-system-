@@ -22,6 +22,8 @@ screen recorder, or `scrcpy` to mirror the phone onto the desktop and record one
 | 4:40 | Log out on the phone | "Logout revokes the token on the server." |
 | 5:00 | End | — |
 
+**Showing iOS too (optional):** after step 3:40, open the app on an iPhone (Expo Go or TestFlight), log in with the same account and show the same data — tap a status pill to show the native iOS action sheet. Keep it under 30 seconds so the video stays within 5 minutes.
+
 **Test accounts from the seed script** (if you'd rather show existing data):
 `demo@example.com` / `Demo@12345` and `reviewer@example.com` / `Demo@12345`
 (the second account's project is never visible to the first — a quick way to show data isolation).

@@ -68,6 +68,7 @@ export default function TaskFormScreen() {
         },
       });
     } else {
+      if (!dueDate) setDueDate(toIsoDate(value));
       setShowIosPicker((s) => !s);
     }
   };
@@ -115,9 +116,26 @@ export default function TaskFormScreen() {
   const projectName = projects.data?.find((p) => p.id === projectId)?.name;
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Stack.Screen options={{ title: isEdit ? 'Edit task' : 'New task' }} />
-      <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={undefined}>
+      <Stack.Screen
+        options={{
+          title: isEdit ? 'Edit task' : 'New task',
+          // iOS shows this screen as a sheet without a back arrow, so give it a Cancel button.
+          headerLeft:
+            Platform.OS === 'ios'
+              ? () => (
+                  <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button">
+                    <Text style={styles.headerBtn}>Cancel</Text>
+                  </Pressable>
+                )
+              : undefined,
+        }}
+      />
+      <ScrollView
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 24 }]}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets // iOS: keep the focused field above the keyboard
+      >
         <Notice message={formError} />
         <TextField label="Task name" required value={name} onChangeText={setName} error={errors.name} placeholder="e.g. Implement login page" maxLength={160} />
 
@@ -187,12 +205,18 @@ export default function TaskFormScreen() {
           </View>
           {errors.dueDate ? <Text style={styles.error}>{errors.dueDate}</Text> : null}
           {showIosPicker && Platform.OS === 'ios' ? (
-            <DateTimePicker
-              value={dueDate ? fromIsoDate(dueDate) : new Date()}
-              mode="date"
-              display="inline"
-              onChange={(_e, d) => d && setDueDate(toIsoDate(d))}
-            />
+            <View style={styles.iosPicker}>
+              <DateTimePicker
+                value={dueDate ? fromIsoDate(dueDate) : new Date()}
+                mode="date"
+                display="inline"
+                accentColor={colors.action}
+                onChange={(_e, d) => d && setDueDate(toIsoDate(d))}
+              />
+              <Pressable onPress={() => setShowIosPicker(false)} style={styles.iosDone} accessibilityRole="button">
+                <Text style={styles.headerBtn}>Done</Text>
+              </Pressable>
+            </View>
           ) : null}
         </View>
 
@@ -245,4 +269,7 @@ const styles = StyleSheet.create({
   },
   dateText: { fontSize: 15, color: colors.ink },
   clear: { paddingHorizontal: 4 },
+  headerBtn: { fontSize: 16, fontWeight: '600', color: colors.action },
+  iosPicker: { backgroundColor: colors.surface, borderRadius: radius.box, borderWidth: 1, borderColor: colors.line, padding: 8 },
+  iosDone: { alignSelf: 'flex-end', paddingHorizontal: 12, paddingVertical: 8 },
 });

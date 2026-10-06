@@ -43,6 +43,7 @@ create task against the live API.
 | Mark completed, change status & priority | Checkbox; tap status pill / priority bars; segmented controls in form | Code review, typecheck |
 | Search tasks, filter by status & priority | Search bar + chip rows (backend query params) | Mobile run (UI rendered) |
 | Android required | Expo app with `android.package`, EAS `preview` profile builds an APK | Android JS bundle export succeeds (Hermes) |
+| iOS optional | Same app: `ios.bundleIdentifier`, EAS `ios-simulator` / `preview` / `production` profiles, iOS action sheets, iOS date picker, sheet Cancel button, Keychain storage, ATS-compliant | iOS bundle export succeeds; `expo prebuild -p ios` generates a valid Xcode project/Info.plist. Not run on a device or Simulator in the build environment |
 | Change on one platform appears on other after refresh | Pull-to-refresh on every list; web refetches on focus / F5 | Mobile run + API check |
 | Token in secure storage | `expo-secure-store` (`secureSession.ts`) — Android Keystore | Code |
 | Token expiry → login with clear message | 401 `TOKEN_EXPIRED` handler, expiry timer, foreground check → login notice | Code; API behaviour tested |

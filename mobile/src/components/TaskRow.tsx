@@ -6,6 +6,7 @@ import { useDeleteTask, useUpdateTask } from '../hooks/queries';
 import { errorMessage } from '../services/api';
 import { colors } from '../theme';
 import type { Task, TaskInput, TaskPriority, TaskStatus } from '../types';
+import { chooseOption } from '../utils/chooseOption';
 import { dueLabel } from '../utils/dates';
 import { PRIORITIES, PRIORITY_LABEL, TASK_STATUSES, TASK_STATUS_LABEL } from '../utils/labels';
 import { PriorityMark, TaskStatusPill } from './Badges';
@@ -28,19 +29,23 @@ function TaskRowImpl({ task, showProject }: { task: Task; showProject?: boolean 
     update.mutate({ id: task.id, data }, { onError: (e) => Alert.alert('Couldn’t update task', errorMessage(e)) });
 
   const pickStatus = () =>
-    Alert.alert(
+    chooseOption(
       'Change status',
       task.name,
-      TASK_STATUSES.map((s: TaskStatus) => ({ text: TASK_STATUS_LABEL[s], onPress: () => s !== task.status && change({ status: s }) })),
-      { cancelable: true },
+      TASK_STATUSES.map((s: TaskStatus) => ({
+        label: s === task.status ? `${TASK_STATUS_LABEL[s]} (current)` : TASK_STATUS_LABEL[s],
+        onSelect: () => s !== task.status && change({ status: s }),
+      })),
     );
 
   const pickPriority = () =>
-    Alert.alert(
+    chooseOption(
       'Change priority',
       task.name,
-      PRIORITIES.map((p: TaskPriority) => ({ text: PRIORITY_LABEL[p], onPress: () => p !== task.priority && change({ priority: p }) })),
-      { cancelable: true },
+      PRIORITIES.map((p: TaskPriority) => ({
+        label: p === task.priority ? `${PRIORITY_LABEL[p]} (current)` : PRIORITY_LABEL[p],
+        onSelect: () => p !== task.priority && change({ priority: p }),
+      })),
     );
 
   const confirmDelete = () =>

@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 /**
  * Resolves the backend URL.
@@ -7,7 +8,7 @@ import Constants from 'expo-constants';
  *    development or in eas.json for APK builds). This is what production uses.
  * 2. In development only: the IP of the machine running `expo start`, port
  *    4000. That makes a phone running Expo Go on the same Wi-Fi reach the
- *    backend on your laptop without any configuration.
+ *    backend on your laptop without any configuration (Android and iOS).
  */
 function resolveApiUrl(): string {
   const fromEnv = process.env.EXPO_PUBLIC_API_URL?.trim();
@@ -17,7 +18,9 @@ function resolveApiUrl(): string {
     const hostUri = Constants.expoConfig?.hostUri; // e.g. "192.168.1.20:8081"
     const host = hostUri?.split(':')[0];
     if (host) return `http://${host}:4000/api`;
-    return 'http://10.0.2.2:4000/api'; // Android emulator → host machine
+    // Android emulator reaches the host machine via 10.0.2.2; the iOS
+    // simulator shares the Mac's network, so localhost works there.
+    return Platform.OS === 'android' ? 'http://10.0.2.2:4000/api' : 'http://localhost:4000/api';
   }
 
   // A release build without EXPO_PUBLIC_API_URL is misconfigured; the app

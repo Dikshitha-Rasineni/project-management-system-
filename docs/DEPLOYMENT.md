@@ -8,6 +8,7 @@ Target setup (all have free tiers):
 | Backend API | **Render** (Node web service) | `https://pms-api-xxxx.onrender.com/api` |
 | Web app | **Vercel** (static Vite build) | `https://pms-web-xxxx.vercel.app` |
 | Android app | **Expo EAS Build** | Downloadable `.apk` + install link |
+| iOS app (optional) | **Expo EAS Build** / Expo Go | Simulator build, TestFlight, or Expo Go on an iPhone |
 
 Do the steps in this order — each step needs a URL from the previous one.
 
@@ -122,10 +123,41 @@ The Account tab in the app shows which API URL it is using — handy when debugg
 Release builds only talk to HTTPS backends (Android blocks plain HTTP by default), which is
 another reason the APK must point at the deployed `https://` URL.
 
-## 5. Final check (the demo flow)
+## 5. iOS app — Expo EAS 🔑
+
+The same code base runs on iOS; only the build/distribution differs. Choose by what you have:
+
+| Option | Needs | Command | Result |
+|---|---|---|---|
+| **A. Expo Go on an iPhone** (quickest, good for the demo) | free Expo Go app from the App Store; any OS | `cd mobile && npx expo start` → scan the QR with the iPhone camera | App runs inside Expo Go |
+| **B. iOS Simulator build** | free Expo account; a Mac with Xcode to run it | `npm run build:ios-simulator` | `.tar.gz` with `Tasklane.app` — drag onto a running Simulator |
+| **C. Install on real iPhones** | **Apple Developer Program ($99/yr)** | `npm run build:ios` | internal-distribution link; EAS registers device UDIDs (`npx eas-cli@latest device:create`) |
+| **D. TestFlight** | Apple Developer Program + an app record in App Store Connect | `npm run build:ios-testflight` | build uploaded to TestFlight; invite testers by email |
+
+Before B/C/D:
+
+1. Set `EXPO_PUBLIC_API_URL` in `mobile/eas.json` (same `https://…/api` as for Android — the
+   `ios-simulator`, `preview` and `production` profiles all read it).
+2. Change `ios.bundleIdentifier` in `mobile/app.json` from `com.example.tasklane` to an ID you own
+   (e.g. `com.yourname.tasklane`) — Apple requires it to be unique.
+3. `npx eas-cli@latest login` and `npx eas-cli@latest init` (once, shared with Android).
+4. For C/D, EAS asks for your Apple ID and creates the certificates and provisioning profile for
+   you ("Let EAS handle credentials" → yes).
+
+Notes:
+- Expo Go on an iPhone works with the deployed backend (`EXPO_PUBLIC_API_URL` in
+  `mobile/.env.local`) or with your laptop on the same Wi-Fi (no config needed).
+- Release builds require HTTPS (App Transport Security); plain HTTP is only allowed to the local
+  network, which is what development uses.
+- `ITSAppUsesNonExemptEncryption = false` is set, so TestFlight doesn't ask the export-compliance
+  question on every build. The app uses only standard HTTPS.
+- The submission brief requires Android; iOS is optional. For the submission an Android APK plus,
+  if you like, a TestFlight link or a Simulator build is ideal.
+
+## 6. Final check (the demo flow)
 
 1. Web: register → create a project → add a task → change its status/priority.
-2. Phone (APK): log in with the same account → pull to refresh → the project and task appear.
+2. Phone (APK, or iPhone via Expo Go/TestFlight): log in with the same account → pull to refresh → the project and task appear.
 3. Phone: add or edit a task.
 4. Web: refresh (or just switch back to the tab — it refetches on focus) → the change is there.
 

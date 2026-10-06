@@ -5,16 +5,21 @@
   },
   "build": {
     "development": {
-      "developmentClient": false,
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:4000/api"
-      }
+      "distribution": "internal"
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-YOUR-BACKEND.onrender.com/api"
+      }
+    },
+    "ios-simulator": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://REPLACE-WITH-YOUR-BACKEND.onrender.com/api"

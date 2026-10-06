@@ -1,7 +1,7 @@
-# Tasklane — Project Management System (Web + Android)
+# Tasklane — Project Management System (Web + Android + iOS)
 
-A full-stack project and task manager. A **React web app** and an **Expo (React Native) Android
-app** share **one Express REST API** and **one PostgreSQL database**, so an account created on
+A full-stack project and task manager. A **React web app** and an **Expo (React Native) mobile
+app for Android and iOS** share **one Express REST API** and **one PostgreSQL database**, so an account created on
 either platform works on the other and every change shows up on both after a refresh.
 
 ![Web dashboard](docs/screenshots/web-dashboard.png)
@@ -11,6 +11,7 @@ either platform works on the other and every change shows up on both after a ref
 | Web app | _add after deploying — see [Deployment](#15-deployment)_ |
 | Backend API | _add after deploying_ (`/api/docs` for Swagger UI) |
 | Android APK | _add the EAS build link_ |
+| iOS build | _add the TestFlight / EAS link (optional)_ |
 | Demo video | _add link_ |
 
 ---
@@ -71,10 +72,13 @@ Always computed live for the logged-in user.
 backend, server errors mapped onto form fields, loading skeletons, empty and error states with
 retry, confirmation dialogs, toasts, offline banner, filters kept in the URL, refetch on tab focus.
 
-**Android app** — login/register/logout, dashboard, projects, project tasks, all-tasks view,
+**Mobile app (Android + iOS, one codebase)** — login/register/logout, dashboard, projects, project tasks, all-tasks view,
 create/edit/delete tasks, tick to complete, change status/priority from the list, task search
 and status/priority filters, pull-to-refresh everywhere, token in SecureStore (Android Keystore),
 "session expired" handling, offline banner and friendly no-connection screens.
+Platform-native details: iOS action sheets and Android dialogs for quick status/priority
+changes, inline iOS calendar vs. Android date dialog, iOS sheet with Cancel for the task form,
+Keychain (iOS) / Keystore (Android) token storage.
 
 **Bonus** — integration tests (51), pagination, sorting, Swagger/OpenAPI docs, Docker Compose,
 GitHub Actions CI, server-side token revocation (denylist), structured request logging.
@@ -83,8 +87,9 @@ GitHub Actions CI, server-side token revocation (denylist), structured request l
 
 ```
 ┌──────────────────────┐        ┌──────────────────────┐
-│  Web app (React/Vite)│        │ Android app (Expo RN)│
-│  token: localStorage │        │ token: SecureStore   │
+│  Web app (React/Vite)│        │ Mobile app (Expo RN) │
+│  token: localStorage │        │ Android + iOS        │
+│                      │        │ token: SecureStore   │
 └──────────┬───────────┘        └──────────┬───────────┘
            │  HTTPS + JSON, Authorization: Bearer <JWT>
            └───────────────┬───────────────┘
@@ -117,7 +122,7 @@ serializer (whitelisted fields) → JSON envelope`. All errors flow to one centr
 | Web | React 19, Vite, TypeScript, React Router 7, TanStack Query 5, Axios, React Hook Form + Zod, Tailwind CSS 4, Sonner (toasts), Lucide icons |
 | Mobile | Expo SDK 57, React Native 0.86, TypeScript, Expo Router, TanStack Query 5, expo-secure-store, @react-native-community/netinfo, @react-native-community/datetimepicker |
 | Tests | Vitest + Supertest (API integration tests against a real PostgreSQL test DB) |
-| Deploy | Render (API), Neon (Postgres), Vercel (web), Expo EAS (APK); Docker Compose; GitHub Actions CI |
+| Deploy | Render (API), Neon (Postgres), Vercel (web), Expo EAS (Android APK, iOS simulator build / TestFlight); Docker Compose; GitHub Actions CI |
 
 ## 6. Folder structure
 
@@ -257,13 +262,16 @@ npm run build                 # production build in web/dist
 
 ## 11. Mobile setup
 
-Requirements: Node 20+, the **Expo Go** app on an Android phone (Play Store) *or* an Android
-emulator (Android Studio).
+Requirements: Node 20+ and one of:
+- **Android:** the **Expo Go** app (Play Store) on a phone, or an Android emulator (Android Studio).
+- **iOS:** the **Expo Go** app (App Store) on an iPhone — works from Windows/Linux/macOS, no Apple
+  account needed — or the iOS Simulator (macOS with Xcode only).
 
 ```bash
 cd mobile
 npm install
-npx expo start               # scan the QR code with Expo Go, or press "a" for the emulator
+npx expo start               # Android: scan the QR code in Expo Go, or press "a" for the emulator
+                             # iOS: scan the QR code with the Camera app (opens Expo Go), or press "i" for the Simulator (Mac)
 ```
 
 - Phone + laptop on the same Wi-Fi: no configuration needed — in development the app calls
@@ -348,6 +356,7 @@ Summary:
 | API | Render (`render.yaml` blueprint or manual) | root `backend`, build `npm ci --include=dev && npm run build`, start `npm run start:prod`, env `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN=<vercel url>`, `TRUST_PROXY=1` |
 | Web | Vercel | root `web`, env `VITE_API_URL=https://<api>/api` |
 | Android | Expo EAS | set `EXPO_PUBLIC_API_URL` in `mobile/eas.json`, then `npm run build:apk` |
+| iOS | Expo EAS | same `eas.json` URL, then `npm run build:ios-simulator` (free) or `npm run build:ios-testflight` (Apple Developer account) |
 
 Nothing hard-codes `localhost` in production: the API reads all settings from env vars, the web
 build reads `VITE_API_URL`, and the APK reads `EXPO_PUBLIC_API_URL` from `eas.json`.
@@ -360,8 +369,11 @@ build reads `VITE_API_URL`, and the APK reads `EXPO_PUBLIC_API_URL` from `eas.js
 | Expo Go → deployed backend | `mobile/.env.local`: `EXPO_PUBLIC_API_URL=https://<api>.onrender.com/api` then `npx expo start -c` |
 | Expo Go → backend on your laptop | leave unset (auto-detects laptop IP) |
 | Android emulator → laptop | `http://10.0.2.2:4000/api` (also the automatic fallback) |
+| iOS Simulator → laptop (Mac) | `http://localhost:4000/api` (also the automatic fallback) |
+| iOS build (Simulator / TestFlight) | same `EXPO_PUBLIC_API_URL` in `eas.json` as the APK |
 
-The **Account** tab shows the URL the app is using. Android release builds require `https://`.
+The **Account** tab shows the URL the app is using. Android and iOS release builds require `https://`
+(iOS App Transport Security only allows plain HTTP on the local network).
 
 Building the APK:
 
@@ -370,6 +382,14 @@ cd mobile
 npx eas-cli@latest login
 npx eas-cli@latest init
 npm run build:apk        # eas build -p android --profile preview  → .apk download link
+```
+
+Building for iOS (details in [docs/DEPLOYMENT.md §5](docs/DEPLOYMENT.md#5-ios-app--expo-eas)):
+
+```bash
+npm run build:ios-simulator   # free: .app for the iOS Simulator (no Apple Developer account)
+npm run build:ios             # install on registered iPhones (Apple Developer Program, $99/yr)
+npm run build:ios-testflight  # build + upload to TestFlight (Apple Developer Program)
 ```
 
 ## 17. Testing
@@ -428,7 +448,8 @@ browser; replace them with screenshots from your Android device after building t
 | Leaking internals | Serializers whitelist response fields; 500s return a generic message; stack traces only in logs; auth headers redacted in logs |
 | Cross-origin abuse | CORS allow-list from `CORS_ORIGIN` |
 | Browser hardening | Helmet headers on the API; security headers on the Vercel site |
-| Token theft on mobile | SecureStore (Android Keystore / iOS Keychain), `WHEN_UNLOCKED_THIS_DEVICE_ONLY` |
+| Token theft on mobile | SecureStore (Android Keystore / iOS Keychain), `WHEN_UNLOCKED_THIS_DEVICE_ONLY` (iOS: never synced to iCloud or restored to another device) |
+| Insecure transport (iOS) | App Transport Security: HTTPS required except on the local network |
 | Stale data across accounts | Query caches cleared on login/logout on both clients |
 
 ## 20. Design decisions
@@ -468,5 +489,8 @@ browser; replace them with screenshots from your Android device after building t
   "you're offline" message.
 - No password reset / email verification (out of scope).
 - Render's free tier sleeps when idle, so the first request after a while is slow.
-- iOS was not targeted (optional in the brief); the code is cross-platform but untested on iOS.
+- iOS: the app bundles for iOS and its native project generates correctly, but in this build
+  environment it was not run on a physical iPhone or the Simulator — do one pass in Expo Go on an
+  iPhone before recording. Installing a build on real iPhones (outside Expo Go) needs a paid
+  Apple Developer account.
 - The Docker setup is provided for convenience; the primary documented path is Node + PostgreSQL.

@@ -30,7 +30,10 @@
     "typecheck": "tsc --noEmit",
     "doctor": "npx expo-doctor",
     "build:apk": "npx eas-cli@latest build -p android --profile preview",
-    "build:aab": "npx eas-cli@latest build -p android --profile production"
+    "build:aab": "npx eas-cli@latest build -p android --profile production",
+    "build:ios-simulator": "npx eas-cli@latest build -p ios --profile ios-simulator",
+    "build:ios": "npx eas-cli@latest build -p ios --profile preview",
+    "build:ios-testflight": "npx eas-cli@latest build -p ios --profile production --auto-submit"
   },
   "private": true
 }
