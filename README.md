@@ -10,9 +10,7 @@ either platform works on the other and every change shows up on both after a ref
 |---|---|
 | Web app | https://project-management-system-2q8b.vercel.app |
 | Backend API | https://tasklane-api-w9ik.onrender.com/api/docs |
-| Android APK | _add the EAS build link_ |
-| iOS build | _add the TestFlight / EAS link (optional)_ |
-| Demo video | _add link_ |
+| Demo video |https://drive.google.com/file/d/1u_EJj8gEusAaZi4Oy998Y0u6VWcy61x-/view?usp=drivesdk|
 
 ---
 
